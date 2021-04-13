@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 
-const Header = () => {
+function Header({ user, signOut }) {
     return (
         <Wrapper>
             <Main>
@@ -17,11 +17,11 @@ const Header = () => {
                 <HelpOutlineIcon/>
             </Main>
             <UserWrapper>
-                <Name>
-                    Ayush
+                <Name >
+                    {user.name}
                 </Name>
-                <UserImage>
-                    <img src='https://www.mockofun.com/wp-content/uploads/2019/12/circle-photo.jpg' />
+                <UserImage onClick={signOut}>
+                    <img src={user.photo ? user.photo : 'https://thumbs.dreamstime.com/b/default-avatar-profile-vector-user-profile-default-avatar-profile-vector-user-profile-profile-179376714.jpg'} />
                 </UserImage>
             </UserWrapper>
         </Wrapper>
@@ -53,7 +53,7 @@ const SearchWrapper = styled.div `
 
 const Search = styled.div `
     width: 100%;
-    box-shadow: inset 0 0 0 1px rgba(104 74 104);
+    box-shadow: inset 0 0 0 1px white;
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -81,6 +81,7 @@ const Name = styled.div ``
 
 const UserImage = styled.div `
     height: 20px;
+    margin-left: 10px;
     img{
         height: 100%;
         border-radius: 10px;

@@ -1,7 +1,7 @@
 import './App.css';
 import styled from 'styled-components'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-import db from './Firebase'
+import db, { auth } from './Firebase'
 import { useState,useEffect } from 'react'
 
 import Chat from './components/Chat'
@@ -12,14 +12,20 @@ import Sidebar from './components/Sidebar'
 function App() {
 
   const [ rooms, setRooms] = useState([]);
+  const [ user, setUser ] = useState(JSON.parse(localStorage.getItem('user')));
 
   const getChannels = () => {
     db.collection('rooms').onSnapshot((snapshot) => {
-      snapshot.docs.map((docs) => {
         setRooms(snapshot.docs.map((doc) => {
           return { id: doc.id, name: doc.data().name }
         }))
-      })
+    })
+  }
+
+  const signOut = () => {
+    auth.signOut().then(() => {
+      localStorage.removeItem('user');
+      setUser(null);  
     })
   }
 
@@ -33,22 +39,31 @@ function App() {
 
 
   return (
-      <Wrapper>
+      <div>
         <Router>
-        <Header />
-        <Main>
-          <Sidebar rooms = {rooms} />
-        <Switch>
-         <Route path='/room'>
-           <Chat />
-         </Route>
-         <Route path='/'>
-           <Login />
-         </Route>
-       </Switch>
-        </Main>
+        {
+          !user ? 
+          <Login setUser={setUser} />
+          :
+          <Wrapper>
+            <Header signOut={signOut} user={user} />
+            <Main>
+             <Sidebar rooms = {rooms} />
+              <Switch>
+              <Route path='/room/:channelId'>
+               <Chat user= {user} />
+              </Route>
+              <Route path='/'>
+                Select or Create Channel
+              </Route>
+              </Switch>
+             </Main>
+          </Wrapper>
+        }
+          
        </Router>
-      </Wrapper>
+       </div>
+        
     
   );
 }
@@ -57,7 +72,7 @@ export default App;
 
 const Wrapper = styled.div `
   display: grid;
-  grid-template-rows: 30px auto;
+  grid-template-rows: 30px minmax(0, 1fr);
   height: 100vh;
 `
 
